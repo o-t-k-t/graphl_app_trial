@@ -9,11 +9,11 @@ import (
 )
 
 type UserRepository struct {
-	entClient ent.Client
+	EntClient *ent.Client
 }
 
 func (ur UserRepository) FindUser(id int) (entity.User, error) {
-	u, err := ur.entClient.User.Get(context.Background(), id)
+	u, err := ur.EntClient.User.Get(context.Background(), id)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -22,7 +22,7 @@ func (ur UserRepository) FindUser(id int) (entity.User, error) {
 }
 
 func (ur UserRepository) FindUsers() ([]entity.User, error) {
-	us, err := ur.entClient.User.Query().All(context.Background())
+	us, err := ur.EntClient.User.Query().All(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -31,13 +31,27 @@ func (ur UserRepository) FindUsers() ([]entity.User, error) {
 }
 
 func (ur UserRepository) FindUsersByName(name string) ([]entity.User, error) {
-	us, err := ur.entClient.
+	us, err := ur.EntClient.
 		User.Query().Where(user.NameContains(name)).All(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
 	return ur.toEntitySlice(us), nil
+}
+
+func (ur UserRepository) Create(u entity.User) (entity.User, error) {
+	record, err := ur.EntClient.
+		User.
+		Create().
+		SetAge(u.Age).
+		SetName(u.Name).
+		Save(context.Background())
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return entity.User(*record), nil
 }
 
 func (ur UserRepository) toEntitySlice(us []*ent.User) []entity.User {

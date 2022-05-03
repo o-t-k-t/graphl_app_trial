@@ -5,18 +5,17 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/o-t-k-t/graphl_app_trial/graph/generated"
 	"github.com/o-t-k-t/graphl_app_trial/graph/model"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.UserController.Create(ctx, input)
 }
 
 func (r *queryResolver) ListUsers(ctx context.Context) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.UserController.List(ctx)
 }
 
 // Mutation returns generated.MutationResolver implementation.

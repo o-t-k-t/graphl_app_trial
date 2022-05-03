@@ -1,7 +1,13 @@
 package graph
 
-// This file will not be regenerated automatically.
-//
-// It serves as dependency injection for your app, add any dependencies you require here.
+import (
+	"github.com/o-t-k-t/graphl_app_trial/ent"
 
-type Resolver struct{}
+	"github.com/o-t-k-t/graphl_app_trial/app/adapter/controller"
+)
+
+type Resolver struct {
+	entClient ent.Client
+
+	UserController controller.UserController
+}

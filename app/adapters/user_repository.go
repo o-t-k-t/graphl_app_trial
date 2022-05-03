@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
+	"github.com/o-t-k-t/graphl_app_trial/app/entity"
 	"github.com/o-t-k-t/graphl_app_trial/ent"
 	"github.com/o-t-k-t/graphl_app_trial/ent/user"
-	"github.com/o-t-k-t/graphl_app_trial/entity"
 )
 
 type UserRepository struct {

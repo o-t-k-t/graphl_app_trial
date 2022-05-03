@@ -7,3 +7,6 @@ server:
 
 migration:
 	go run cmd/migration/migration.go
+
+schema:
+	go run entgo.io/ent/cmd/ent describe ./ent/schema

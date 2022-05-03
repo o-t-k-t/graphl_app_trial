@@ -1,3 +1,6 @@
+generate:
+	go generate ./...
+
 build:
 	go build -o ./bin cmd/server/server.go
 	go build -o ./bin cmd/migration/migration.go

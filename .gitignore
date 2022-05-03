@@ -1,6 +1,7 @@
 # Generated code
 /ent/**
 !/ent/schema/**
+!/ent/generate.go
 
 /graph/generated/
 /graph/model/models_gen.go

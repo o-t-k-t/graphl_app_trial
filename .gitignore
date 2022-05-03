@@ -1,4 +1,9 @@
+# Generated code
 /ent/**
 !/ent/schema/**
 
+/graph/generated/
+/graph/model/models_gen.go
+
+# Binary
 /bin/

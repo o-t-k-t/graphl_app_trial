@@ -6,9 +6,7 @@ type User {
   id: ID!
   name: String!
 
-  carCount: Int!
-
-  Cars: Cars!
+  cars: Cars!
 }
 
 type Cars {

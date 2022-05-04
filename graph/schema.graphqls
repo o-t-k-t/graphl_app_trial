@@ -10,7 +10,7 @@ type User {
 }
 
 type Cars {
-  Count: Int!
+  count: Int!
 }
 
 type Query {

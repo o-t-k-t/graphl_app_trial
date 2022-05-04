@@ -5,6 +5,14 @@
 type User {
   id: ID!
   name: String!
+
+  carCount: Int!
+
+  Cars: Cars!
+}
+
+type Cars {
+  Count: Int!
 }
 
 type Query {

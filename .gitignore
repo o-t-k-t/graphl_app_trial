@@ -8,3 +8,4 @@
 
 # Binary
 /bin/
+!/bin/.keep

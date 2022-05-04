@@ -8,6 +8,8 @@ import (
 	"github.com/o-t-k-t/graphl_app_trial/ent/user"
 )
 
+// UserRepository is a implementation of repository pattern.
+// there is not anything else to comment.
 type UserRepository struct {
 	EntClient *ent.Client
 }
@@ -54,8 +56,12 @@ func (ur UserRepository) Create(u entity.User) (entity.User, error) {
 	return entity.User(*record), nil
 }
 
+func (ur UserRepository) BatchFindCars() ([]int, error) {
+	return nil, nil
+}
+
 func (ur UserRepository) toEntitySlice(us []*ent.User) []entity.User {
-	eus := make([]entity.User, len(us))
+	eus := make([]entity.User, 0, len(us))
 	for _, u := range us {
 		eus = append(eus, entity.User(*u))
 	}

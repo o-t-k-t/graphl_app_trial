@@ -7,6 +7,7 @@ import (
 type UserRepository interface {
 	FindUsers() ([]entity.User, error)
 	Create(u entity.User) (entity.User, error)
+	BatchFindCars() ([]int, error)
 }
 
 type UserUsecase struct {
@@ -19,4 +20,8 @@ func (uc UserUsecase) FindUsers() ([]entity.User, error) {
 
 func (uc UserUsecase) CreateUser(u entity.User) (entity.User, error) {
 	return uc.UserRepository.Create(u)
+}
+
+func (uc UserUsecase) BatchFindCars(userIds []int) ([]entity.UserCars, error) {
+	return make([]entity.UserCars, len(userIds)), nil
 }

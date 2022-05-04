@@ -10,8 +10,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/o-t-k-t/graphl_app_trial/app/adapter/controller"
-	"github.com/o-t-k-t/graphl_app_trial/app/adapter/repository"
-	"github.com/o-t-k-t/graphl_app_trial/app/usecase"
+	"github.com/o-t-k-t/graphl_app_trial/app/infrastructure/dataloader"
 	"github.com/o-t-k-t/graphl_app_trial/ent"
 	"github.com/o-t-k-t/graphl_app_trial/graph"
 	"github.com/o-t-k-t/graphl_app_trial/graph/generated"
@@ -34,19 +33,15 @@ func SetupServer() {
 
 	// Setup GraphQL server.
 	resolver := graph.Resolver{
-		UserController: controller.UserController{
-			usecase.UserUsecase{
-				UserRepository: repository.UserRepository{
-					EntClient: entClient,
-				},
-			},
-		},
+		UserController: controller.NewUserController(entClient),
 	}
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver}))
+	dataloaderSrv := dataloader.Middleware(entClient, srv)
+
+	http.Handle("/query", dataloaderSrv)
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

@@ -5,8 +5,8 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/o-t-k-t/graphl_app_trial/app/infrastructure/dataloader"
 	"github.com/o-t-k-t/graphl_app_trial/graph/generated"
 	"github.com/o-t-k-t/graphl_app_trial/graph/model"
 )
@@ -20,7 +20,7 @@ func (r *queryResolver) ListUsers(ctx context.Context) ([]*model.User, error) {
 }
 
 func (r *userResolver) Cars(ctx context.Context, obj *model.User) (*model.Cars, error) {
-	panic(fmt.Errorf("not implemented"))
+	return dataloader.For(ctx).LoadUserCars(ctx, obj.ID)
 }
 
 // Mutation returns generated.MutationResolver implementation.

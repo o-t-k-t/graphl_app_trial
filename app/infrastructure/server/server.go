@@ -18,12 +18,27 @@ import (
 
 const defaultPort = "8080"
 
+func newResolver(e *ent.Client) graph.Resolver {
+	return graph.Resolver{
+		UserController: controller.NewUserController(e),
+	}
+}
+
 func SetupServer() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
+	http.Handle("/query", createGraphQLHandler())
+
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func createGraphQLHandler() http.Handler {
 	// Establish database connection.
 	entClient, err := ent.Open("postgres", "dbname=feeder_development user=postgres password=postgres sslmode=disable")
 	if err != nil {
@@ -31,18 +46,10 @@ func SetupServer() {
 	}
 	defer entClient.Close()
 
+	// Create GraphQL Reslover
+	resolver := newResolver(entClient)
+
 	// Setup GraphQL server.
-	resolver := graph.Resolver{
-		UserController: controller.NewUserController(entClient),
-	}
-
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver}))
-	dataloaderSrv := dataloader.Middleware(entClient, srv)
-
-	http.Handle("/query", dataloaderSrv)
-
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	return dataloader.Middleware(entClient, srv)
 }

@@ -7,46 +7,72 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
+
+	"github.com/sebdah/goldie/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGraphQLEndpoint_ByTestData(t *testing.T) {
-	// Arange (server)
-	ts := httptest.NewServer(createGraphQLHandler())
-	defer ts.Close()
+	// ARRANGE
+	const testFileDir = "./testdata/queries"
+	const expectFileDir = "./testdata/expected"
 
-	// Arange (HTTP Request)
-	q := struct{ Query string }{
-		Query: "{listUsers {name}}",
-	}
-	body := bytes.Buffer{}
-	if err := json.NewEncoder(&body).Encode(&q); err != nil {
-		t.Fatal("error encode", err)
-	}
-
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, ts.URL, &body)
+	// Get golden file list.
+	files, err := os.ReadDir(testFileDir)
 	if err != nil {
-		t.Fatal("error new request", err)
+		t.Fatal(err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	// Build a server
+	handler := createGraphQLHandler()
+	defer closeGraphQLHandler()
 
-	// Act
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatal("error request", err)
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		t.Run(file.Name(), func(t *testing.T) {
+			// Read test case files
+			query, err := ioutil.ReadFile(filepath.Join(testFileDir, file.Name()))
+			assert.Equal(t, nil, err)
+
+			// GQL Query to JSON
+			jsonReq, err := json.Marshal(struct {
+				Query string `json:"query"`
+			}{
+				Query: string(query),
+			})
+			assert.Equal(t, nil, err)
+
+			// Create request from query file.
+			req, err := http.NewRequestWithContext(
+				context.Background(),
+				http.MethodPost, "/query",
+				bytes.NewReader(jsonReq),
+			)
+			assert.Nil(t, err)
+			req.Header.Set("Content-Type", "application/json")
+
+			// Create response recoder.
+			recorder := httptest.NewRecorder()
+
+			// ACT
+			handler.ServeHTTP(recorder, req)
+
+			// ASSERT
+			data := struct{ Type string }{Type: "Golden"}
+
+			// compare recorded file. (or record file)
+			goldie.New(t).AssertWithTemplate(
+				t,
+				file.Name(),
+				data,
+				recorder.Body.Bytes(),
+			)
+		})
 	}
-	defer res.Body.Close()
-
-	// Assert
-	result, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		t.Fatal("error read body", err)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		t.Fatal("error request code:", res.StatusCode, string(result))
-	}
-
-	t.Log(string(result))
 }

@@ -1,62 +1,8 @@
 package controller
 
 import (
-	"context"
-	"reflect"
 	"testing"
-
-	"github.com/99designs/gqlgen/graphql"
 )
-
-func TestNewConstraintController(t *testing.T) {
-	tests := []struct {
-		name string
-		want ConstraintController
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewConstraintController(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewConstraintController() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestConstraintController_Constraint(t *testing.T) {
-	type args struct {
-		ctx       context.Context
-		obj       interface{}
-		next      graphql.Resolver
-		minLength *int
-		maxLength *int
-		min       *int
-		max       *int
-	}
-	tests := []struct {
-		name    string
-		c       ConstraintController
-		args    args
-		wantRes interface{}
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := ConstraintController{}
-			gotRes, err := c.Constraint(tt.args.ctx, tt.args.obj, tt.args.next, tt.args.minLength, tt.args.maxLength, tt.args.min, tt.args.max)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ConstraintController.Constraint() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("ConstraintController.Constraint() = %v, want %v", gotRes, tt.wantRes)
-			}
-		})
-	}
-}
 
 func TestConstraintController_validate(t *testing.T) {
 	type args struct {
@@ -67,13 +13,20 @@ func TestConstraintController_validate(t *testing.T) {
 		min       *int
 		max       *int
 	}
+	sp := func(s string) *string { return &s }
+	ip := func(i int) *int { return &i }
+
 	tests := []struct {
 		name    string
-		c       ConstraintController
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"If int value in range, return success", args{map[string]interface{}{"field": int64(100)}, sp("field"), nil, nil, ip(100), ip(100)}, false},
+		{"If int value falls min, return error", args{map[string]interface{}{"field": int64(100)}, sp("field"), nil, nil, ip(101), nil}, true},
+		{"If int value exceeds max, return error", args{map[string]interface{}{"field": int64(100)}, sp("field"), nil, nil, nil, ip(99)}, true},
+		{"If string length in range, return success", args{map[string]interface{}{"field": "hello"}, sp("field"), ip(5), ip(5), nil, nil}, false},
+		{"If string length falls min, return error", args{map[string]interface{}{"field": "hello"}, sp("field"), ip(6), nil, nil, nil}, true},
+		{"If string length exceeds max, return error", args{map[string]interface{}{"field": "hello"}, sp("field"), nil, ip(4), nil, nil}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

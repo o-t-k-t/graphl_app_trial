@@ -29,6 +29,7 @@ func (c ConstraintController) Constraint(
 	field := graphql.GetPathContext(ctx).Field
 
 	if err := c.validate(obj, field, minLength, maxLength, min, max); err != nil {
+		log.Println("AAAAAAAAAAABBBBBBBBBBBBB")
 		return nil, err
 	}
 
@@ -75,7 +76,6 @@ func (c ConstraintController) validate(
 
 	// for Int
 	intVal, ok := val.(int64)
-	log.Printf("aaaaaaaaaaa: %#v", val)
 	if ok {
 		if min != nil {
 			if intVal < int64(*min) {

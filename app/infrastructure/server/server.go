@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,8 +21,8 @@ const defaultPort = "8080"
 
 var entClient *ent.Client
 
-func newResolver(e *ent.Client) graph.Resolver {
-	return graph.Resolver{
+func newResolver(e *ent.Client) *graph.Resolver {
+	return &graph.Resolver{
 		UserController: controller.NewUserController(e),
 	}
 }
@@ -51,11 +52,21 @@ func createGraphQLHandler() http.Handler {
 		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
 
-	// Create GraphQL Reslover
-	resolver := newResolver(entClient)
+	// Register directive handlers
+	directiveController := controller.NewConstraintController()
+
+	config := generated.Config{
+		// Create GraphQL Reslover
+		Resolvers: newResolver(entClient),
+		Directives: generated.DirectiveRoot{
+			Constraint: directiveController.Constraint,
+		},
+	}
+
+	fmt.Printf("AAAAAAAAAAAAAAAAAAAAAAAA: %+v", directiveController)
 
 	// Setup GraphQL server.
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(config))
 	return dataloader.Middleware(entClient, srv)
 }
 

@@ -2,6 +2,29 @@
 #
 # https://gqlgen.com/getting-started/
 
+directive @constraint(
+  # Strings
+  minLength: Int
+  maxLength: Int
+  # startsWith: String
+  # endsWith: String
+  # contains: String
+  # notContains: String
+  # pattern: String
+  # format: String
+
+  # Integers / Floats
+  min: Int
+  max: Int # exclusiveMin: Int # exclusiveMax: Int
+) on # multipleOf: Int
+
+INPUT_FIELD_DEFINITION
+
+# According to below proposal.
+# REFER: https://github.com/APIs-guru/graphql-constraints-spec
+# Referencing this implementation
+# REFER: https://github.com/itmayziii/sub-games-backend/blob/71706e28906f7ec0d16785d53f373b3738d5d338/type-defs/api/directives.graphql
+
 type User {
   id: ID!
   name: String!
@@ -19,7 +42,7 @@ type Query {
 
 input UserInput {
   name: String!
-  age: Int!
+  age: Int! @constraint(max: 200, min: 0)
 }
 
 type Mutation {

@@ -16,7 +16,7 @@ build: generate
 # Install CLI tools.
 install:
 	go install github.com/99designs/gqlgen@v0.17.5
-	go install entgo.io/ent/cmd/ent@0.10.0
+	go install entgo.io/ent/cmd/ent@v0.10.1
 
 # Run local server.
 server:
@@ -28,4 +28,4 @@ migration:
 
 # Show database sdchema.
 schema:
-	go run entgo.io/ent/cmd/ent describe ./ent/schema
+	go run entgo.io/ent/cmd/ent@v0.10.1 describe ./ent/schema

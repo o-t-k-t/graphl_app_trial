@@ -70,18 +70,21 @@ func (c ConstraintController) validate(
 
 func (c ConstraintController) validateFieldIfString(val interface{}, minLength, maxLength *int) error {
 	strVal, ok := val.(string)
-	if ok {
-		len := len(strVal)
-		if minLength != nil {
-			if len < *minLength {
-				return fmt.Errorf("field too short. %d", len)
-			}
-		}
+	if !ok {
+		return nil
+	}
 
-		if maxLength != nil {
-			if len > *maxLength {
-				return fmt.Errorf("field too long. %d", len)
-			}
+	len := len(strVal)
+
+	if minLength != nil {
+		if len < *minLength {
+			return fmt.Errorf("field too short. %d", len)
+		}
+	}
+
+	if maxLength != nil {
+		if len > *maxLength {
+			return fmt.Errorf("field too long. %d", len)
 		}
 	}
 	return nil
@@ -89,17 +92,19 @@ func (c ConstraintController) validateFieldIfString(val interface{}, minLength, 
 
 func (c ConstraintController) validateFieldIfInt(val interface{}, min, max *int) error {
 	intVal, ok := val.(int64)
-	if ok {
-		if min != nil {
-			if intVal < int64(*min) {
-				return fmt.Errorf("field too small. %d", intVal)
-			}
-		}
+	if !ok {
+		return nil
+	}
 
-		if max != nil {
-			if intVal > int64(*max) {
-				return fmt.Errorf("field too large. %d", intVal)
-			}
+	if min != nil {
+		if intVal < int64(*min) {
+			return fmt.Errorf("field too small. %d", intVal)
+		}
+	}
+
+	if max != nil {
+		if intVal > int64(*max) {
+			return fmt.Errorf("field too large. %d", intVal)
 		}
 	}
 	return nil

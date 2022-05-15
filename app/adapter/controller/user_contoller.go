@@ -31,15 +31,15 @@ func NewUserController(entClient *ent.Client) UserController {
 
 func (c UserController) Create(ctx context.Context, input model.UserInput) (*model.User, error) {
 	// translate input into domain entity.
-	userInput := entity.User{
-		Name: input.Name,
-		Age:  input.Age,
+	user, err := entity.NewUser(input.Name, input.Age)
+	if err != nil {
+		return nil, fmt.Errorf("create failed %w", err)
 	}
 
 	// execute application logic.
-	createdUser, err := c.UserUsecase.CreateUser(userInput)
+	createdUser, err := c.UserUsecase.CreateUser(user)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create failed %w", err)
 	}
 
 	// translate domain entity into view model

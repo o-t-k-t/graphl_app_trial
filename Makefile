@@ -5,6 +5,7 @@ generate:
 # Geneerate unit test code.
 # PATH=./...
 # generate_ut:
+# 	go install github.com/cweill/gotests/...
 # 	gotests -all $(PATH)
 
 # Build Binary for each entrypoints.
@@ -14,8 +15,8 @@ build: generate
 
 # Install CLI tools.
 install:
-	go intall github.com/99designs/gqlgen@v0.17.5
-	go install github.com/cweill/gotests/...
+	go install github.com/99designs/gqlgen@v0.17.5
+	go install entgo.io/ent/cmd/ent@0.10.0
 
 # Run local server.
 server:

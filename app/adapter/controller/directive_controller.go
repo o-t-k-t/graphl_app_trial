@@ -57,38 +57,50 @@ func (c ConstraintController) validate(
 	}
 
 	// gqlgen's validation checks that flied type and presence matche with the schema. so we don't. (focus only value)
-	// for String
+	if err := c.validateFieldIfString(val, minLength, maxLength); err != nil {
+		return err
+	}
+
+	if err := c.validateFieldIfInt(val, min, max); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c ConstraintController) validateFieldIfString(val interface{}, minLength, maxLength *int) error {
 	strVal, ok := val.(string)
 	if ok {
 		len := len(strVal)
 		if minLength != nil {
 			if len < *minLength {
-				return fmt.Errorf("field too short. %s, %d", *field, len)
+				return fmt.Errorf("field too short. %d", len)
 			}
 		}
 
 		if maxLength != nil {
 			if len > *maxLength {
-				return fmt.Errorf("field too long. %s, %d", *field, len)
+				return fmt.Errorf("field too long. %d", len)
 			}
 		}
 	}
+	return nil
+}
 
-	// for Int
+func (c ConstraintController) validateFieldIfInt(val interface{}, min, max *int) error {
 	intVal, ok := val.(int64)
 	if ok {
 		if min != nil {
 			if intVal < int64(*min) {
-				return fmt.Errorf("field too small. %s, %d", *field, intVal)
+				return fmt.Errorf("field too small. %d", intVal)
 			}
 		}
 
 		if max != nil {
 			if intVal > int64(*max) {
-				return fmt.Errorf("field too large. %s, %d", *field, intVal)
+				return fmt.Errorf("field too large. %d", intVal)
 			}
 		}
 	}
-
 	return nil
 }

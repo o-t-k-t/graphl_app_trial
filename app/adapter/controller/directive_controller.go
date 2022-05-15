@@ -6,12 +6,9 @@ import (
 	"log"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/o-t-k-t/graphl_app_trial/app/usecase"
 )
 
-type ConstraintController struct {
-	UserUsecase usecase.UserUsecase
-}
+type ConstraintController struct{}
 
 func NewConstraintController() ConstraintController {
 	return ConstraintController{}
